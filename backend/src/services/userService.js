@@ -35,9 +35,7 @@ const deleteUserService = async (userData) => {
   if (!userData.id) {
     throw new Error("User ID is required");
   }
-  const user = new User(userData);
-  user.deleteUser();
-  const deletedUser = await userRepository.updateUser(user);
+  const deletedUser = await userRepository.deleteUser(userData.id);
   return deletedUser;
 }
 

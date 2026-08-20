@@ -1,11 +1,13 @@
 const express = require('express');
 const taskRoutes = require('./src/routes/taskRoutes');
+const categoryRoutes = require('./src/routes/categoryRoutes');
 const userRoutes = require('./src/routes/userRoutes');
 const pool = require("./src/db/db");
 const app = express();
 
 app.use(express.json());
 app.use('/api', taskRoutes);
+app.use('/api', categoryRoutes);
 app.use('/api/users', userRoutes);
 pool.query("SELECT NOW()")
     .then(() => console.log("Database connected successfully"))
