@@ -27,7 +27,7 @@ const updateUserService = async (userData) => {
     throw new Error("User ID is required");
   }
   const user = new User(userData);
-  const updatedUser = await userRepository.updateUser(user);
+  const updatedUser = await userRepository.updateUser(user, userData.id);
   return updatedUser;
 };
 

@@ -41,10 +41,42 @@ const getAllUsersById = async (userId) => {
   return result.rows;
 };
 
+const updateUser = async (userData, userId) => {
+  const query = `
+    SELECT * FROM update_user($1, $2, $3, $4, $5, $6);
+  `;
+// console.log("Repository update values:", userData);
+  const values = [
+    userId,
+    userData.name ?? null,
+    userData.username ?? null,
+    userData.email ?? null,
+    userData.status ?? null,
+    userData.role ?? null,
+  ];
+console.log("Repository update values:", values);
+  const result = await pool.query(query, values);
+
+  return result.rows[0];
+};
+
+const deleteUser = async (userId) => {
+  const query = `
+    SELECT * FROM delete_user($1);
+  `;
+
+  const result = await pool.query(query, [userId]);
+
+  return result.rows[0];
+};
+
 
 
 module.exports = {
   createUser,
   getAllUsers,
   getAllUsersById,
+  updateUser,
+  deleteUser,
+
 };
