@@ -3,7 +3,7 @@
 import { Building2, CheckCircle2, CreditCard, RefreshCw, ShieldCheck, Sparkles, Users, WalletCards } from "lucide-react";
 import { useEffect, useState } from "react";
 import { StatCard } from "@/components/stat-card";
-import { fetchUsers } from "@/lib/api";
+import { fetchCategories, fetchUsers } from "@/lib/api";
 import { DonutScore, MiniBarChart, PulsePanel } from "@/components/chart-panel";
 
 const portfolioRows = [
@@ -24,9 +24,11 @@ const chartData = [
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     fetchUsers().then(setUsers);
+    fetchCategories().then(setCategories);
   }, []);
 
   const activeUsers = users.filter((user) => user.status === "ACTIVE").length;
@@ -61,7 +63,7 @@ export default function AdminDashboard() {
         <StatCard label="Active users" value={activeUsers} detail="Ready to assign todos" accent="bg-mint" icon={CheckCircle2} />
         <StatCard label="Admin seats" value={admins} detail="Elevated access" accent="bg-amberline" icon={ShieldCheck} />
         <StatCard label="Open tasks" value="24" detail="Across boards" accent="bg-coral" icon={WalletCards} />
-        <StatCard label="Categories" value="8" detail="Master data ready" accent="bg-sky-500" icon={Building2} />
+        <StatCard label="Categories" value={categories.length} detail="Master data ready" accent="bg-sky-500" icon={Building2} />
         <StatCard label="Pending MFA" value={Math.max(users.length - activeUsers, 0)} detail="Needs review" accent="bg-pink-500" icon={CreditCard} />
       </section>
 

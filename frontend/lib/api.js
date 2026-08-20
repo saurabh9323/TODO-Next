@@ -30,6 +30,30 @@ const seedUsers = [
   }
 ];
 
+const seedCategories = [
+  {
+    id: "c-1001",
+    name: "Work",
+    description: "Daily delivery and operational tasks",
+    status: "ACTIVE",
+    createdAt: "2026-08-01"
+  },
+  {
+    id: "c-1002",
+    name: "Personal",
+    description: "Private reminders and life admin",
+    status: "ACTIVE",
+    createdAt: "2026-08-05"
+  },
+  {
+    id: "c-1003",
+    name: "Backlog",
+    description: "Ideas waiting for prioritization",
+    status: "INACTIVE",
+    createdAt: "2026-08-12"
+  }
+];
+
 export function getStoredUsers() {
   if (typeof window === "undefined") return seedUsers;
   const stored = localStorage.getItem("todo_users");
@@ -40,6 +64,18 @@ export function getStoredUsers() {
 
 export function saveStoredUsers(users) {
   localStorage.setItem("todo_users", JSON.stringify(users));
+}
+
+export function getStoredCategories() {
+  if (typeof window === "undefined") return seedCategories;
+  const stored = localStorage.getItem("todo_categories");
+  if (stored) return JSON.parse(stored);
+  localStorage.setItem("todo_categories", JSON.stringify(seedCategories));
+  return seedCategories;
+}
+
+export function saveStoredCategories(categories) {
+  localStorage.setItem("todo_categories", JSON.stringify(categories));
 }
 
 async function request(path, options = {}) {
@@ -125,5 +161,59 @@ export async function createTask(task) {
     return payload.data;
   } catch {
     return { ...task, id: `t-${Date.now()}` };
+  }
+}
+
+export async function fetchCategories() {
+  try {
+    const payload = await request("/categories");
+    return payload.data || [];
+  } catch {
+    return getStoredCategories();
+  }
+}
+
+export async function createCategory(category) {
+  try {
+    const payload = await request("/categories", {
+      method: "POST",
+      body: JSON.stringify(category)
+    });
+    return payload.data;
+  } catch {
+    const categories = getStoredCategories();
+    const nextCategory = {
+      ...category,
+      id: `c-${Date.now()}`,
+      createdAt: new Date().toISOString().slice(0, 10)
+    };
+    saveStoredCategories([nextCategory, ...categories]);
+    return nextCategory;
+  }
+}
+
+export async function updateCategory(category) {
+  try {
+    const payload = await request(`/categories/${category.id}`, {
+      method: "PUT",
+      body: JSON.stringify(category)
+    });
+    return payload.data;
+  } catch {
+    const categories = getStoredCategories().map((item) =>
+      String(item.id) === String(category.id) ? { ...item, ...category } : item
+    );
+    saveStoredCategories(categories);
+    return category;
+  }
+}
+
+export async function deleteCategory(id) {
+  try {
+    await request(`/categories/${id}`, {
+      method: "DELETE"
+    });
+  } catch {
+    saveStoredCategories(getStoredCategories().filter((category) => String(category.id) !== String(id)));
   }
 }

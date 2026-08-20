@@ -10,13 +10,13 @@ module.exports = {
     extend: {
       colors: {
         ink: "#17202A",
-        paper: "#F8FAFC",
-        coral: "#F97367",
+        paper: "rgb(var(--brand-background, 248 250 252) / <alpha-value>)",
+        coral: "rgb(var(--brand-accent, 249 115 103) / <alpha-value>)",
         mint: "#0EA5A4",
-        plum: "#56204F",
-        orchid: "#A44A9D",
-        blush: "#FFF6FC",
-        lilac: "#F4E6F3",
+        plum: "rgb(var(--brand-sidebar, 86 32 79) / <alpha-value>)",
+        orchid: "rgb(var(--brand-primary, 164 74 157) / <alpha-value>)",
+        blush: "rgb(var(--brand-background, 255 246 252) / <alpha-value>)",
+        lilac: "rgb(var(--brand-secondary, 244 230 243) / <alpha-value>)",
         amberline: "#F5B841",
         skyglass: "#EAF9FF"
       },

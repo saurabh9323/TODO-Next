@@ -1,4 +1,5 @@
 import "./globals.css";
+import { BrandProvider } from "@/components/brand-provider";
 
 export const metadata = {
   title: "Todo Command Center",
@@ -8,7 +9,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>{children}</body>
+      <body>
+        <BrandProvider>{children}</BrandProvider>
+      </body>
     </html>
   );
 }

@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   BarChart3,
   Bell,
+  Brush,
   CheckSquare,
   ChevronRight,
   Command,
@@ -23,22 +24,24 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { useEffect, useState } from "react";
 
 const adminNav = [
-  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/users", label: "User master", icon: Users },
-  { href: "/admin/users/add", label: "Add user", icon: Plus },
-  { href: "/admin/dashboard", label: "Category master", icon: Database },
-  { href: "/admin/dashboard", label: "Automation rules", icon: SlidersHorizontal }
+  { id: "admin-dashboard", href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { id: "admin-users", href: "/admin/users", label: "User master", icon: Users },
+  { id: "admin-categories", href: "/admin/categories", label: "Category master", icon: Database },
+  { id: "admin-branding", href: "/admin/branding", label: "Branding master", icon: Brush },
+  { id: "admin-add-user", href: "/admin/users/add", label: "Add user", icon: Plus },
+  { id: "admin-automation", href: "/admin/dashboard", label: "Automation rules", icon: SlidersHorizontal }
 ];
 
 const userNav = [
-  { href: "/user/todos", label: "My todos", icon: CheckSquare },
-  { href: "/user/insights", label: "Insights", icon: BarChart3 }
+  { id: "user-todos", href: "/user/todos", label: "My todos", icon: CheckSquare },
+  { id: "user-insights", href: "/user/insights", label: "Insights", icon: BarChart3 }
 ];
 
 export function AppShell({ children, role = "USER" }) {
   const pathname = usePathname();
   const router = useRouter();
   const [session, setSession] = useState(null);
+  const [brandName, setBrandName] = useState("Todo Command");
   const items = role === "ADMIN" ? adminNav : userNav;
 
   useEffect(() => {
@@ -51,6 +54,16 @@ export function AppShell({ children, role = "USER" }) {
     if (role === "USER" && nextSession.role === "ADMIN") router.replace("/admin/dashboard");
     setSession(nextSession);
   }, [role, router]);
+
+  useEffect(() => {
+    const updateBrandName = () => {
+      const stored = JSON.parse(localStorage.getItem("todo_brand") || "null");
+      setBrandName(stored?.name || "Todo Command");
+    };
+    updateBrandName();
+    window.addEventListener("todo-brand-updated", updateBrandName);
+    return () => window.removeEventListener("todo-brand-updated", updateBrandName);
+  }, []);
 
   function logout() {
     clearSession();
@@ -66,7 +79,7 @@ export function AppShell({ children, role = "USER" }) {
             <ShieldCheck size={21} />
           </span>
           <span>
-            <span className="block text-sm font-black uppercase tracking-wide text-orchid">Todo Command</span>
+            <span className="block text-sm font-black uppercase tracking-wide text-orchid">{brandName}</span>
             <span className="block text-lg font-black">{role === "ADMIN" ? "Admin" : "Workspace"}</span>
           </span>
           </Link>
@@ -76,10 +89,10 @@ export function AppShell({ children, role = "USER" }) {
           <p className="mb-3 px-1 text-xs font-black uppercase tracking-widest text-white/70">{role === "ADMIN" ? "Master" : "Workspace"}</p>
           {items.map((item) => {
             const Icon = item.icon;
-            const active = pathname === item.href;
+            const active = pathname === item.href || (item.href !== "/admin/dashboard" && pathname.startsWith(`${item.href}/`));
             return (
               <Link
-                key={item.href}
+                key={item.id}
                 href={item.href}
                 className={`group flex items-center justify-between rounded-md px-4 py-3 text-sm font-bold transition duration-300 ${
                   active
@@ -153,10 +166,10 @@ export function AppShell({ children, role = "USER" }) {
           <nav className="mt-4 flex gap-2 overflow-x-auto lg:hidden">
             {items.map((item) => {
               const Icon = item.icon;
-              const active = pathname === item.href;
+              const active = pathname === item.href || (item.href !== "/admin/dashboard" && pathname.startsWith(`${item.href}/`));
               return (
                 <Link
-                  key={item.href}
+                  key={item.id}
                   href={item.href}
                   className={`inline-flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-bold ${
                     active ? "bg-plum text-white dark:bg-white dark:text-plum" : "bg-white/80 text-plum dark:bg-white/10 dark:text-slate-200"
